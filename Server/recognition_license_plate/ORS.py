@@ -1,8 +1,8 @@
-import numpy as np
+# import numpy as np
 import cv2
 import pytesseract
-import matplotlib.pyplot as plt
-from PIL import Image
+# import matplotlib.pyplot as plt
+# from PIL import Image
 
 img = cv2.imread('3.jpg')
 cv2.imshow('Hinh anh goc',img)
