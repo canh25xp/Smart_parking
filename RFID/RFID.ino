@@ -28,10 +28,10 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 int servoClose = 0;
 int servoOpen = 90;
 
-int cambien = 5; //Chân cảm biến nối chân số 5 Arduino
-int giatri;
+int SENSOR_PIN = 5;    //Chân cảm biến nối chân số 5 Arduino
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
+
 void setup() {
     lcd.init();
     lcd.backlight();
@@ -44,10 +44,11 @@ void setup() {
     mfrc522.PCD_Init();
     lcd.setCursor(0, 0);
     lcd.print("Scan your card:");
-    pinMode(cambien, INPUT);
+    pinMode(SENSOR_PIN, INPUT);
     myservo.attach(5);
     myservo.write(servoClose);
 }
+
 void loop() {
     if (millis() - scanCard >= 1000) {
         ScanCard();
@@ -56,8 +57,8 @@ void loop() {
     if (millis() - buzzer >= 200) {
         analogWrite(6, 0);
     }
-    //Read status from ESP:
-    read_ESP();
+
+    read_ESP(); //Read status from ESP:
 }
 
 void read_ESP() {
@@ -71,10 +72,7 @@ void read_ESP() {
     if (stringComplete) {
         Serial.print("Data nhận: ");
         Serial.println(statusFromESP);
-        //==============================
-        //Xử lý dữ liệu
         handleData(statusFromESP);
-        //==============================
         statusFromESP = "";
         stringComplete = false;
     }
@@ -90,11 +88,11 @@ void BarrierControl(String statusFromESP) {
 }
 
 void handleData(String statusFromESP) {
-    //Tìm vị trí kí tự
+    // Find character
     int findStarChar, findOpenBracketChar = -1;
     findStarChar = statusFromESP.indexOf("*");
     findOpenBracketChar = statusFromESP.indexOf("(");
-    //Cắt chuỗi
+    // Split string
     if (findStarChar >= 0 && findOpenBracketChar >= 0) {
         statusFromESP = statusFromESP.substring(findStarChar + 1, findOpenBracketChar);
         Serial.print("Data đã xử lý: ");
@@ -132,9 +130,10 @@ void ScanCard() {
     buzzer = millis();
     analogWrite(6, 230);
 }
+
 void sendUID(String content) {
     UIDSend = "";
-    //Đóng gói UID
+    //UID packaging
     UIDSend = "*" + content + "(";
     Serial.print("Send to ESP: ");
     Serial.println(UIDSend);
